@@ -26,6 +26,11 @@
   --red-dim: rgba(248, 113, 113, 0.12);
   --yellow: #fbbf24;
 
+  --accent-primary: #a3f7bf;
+  --accent-success: #22c55e;
+  --accent-warning: #fbbf24;
+  --accent-danger: #f87171;
+  
   --radius-xs: 6px;
   --radius-sm: 10px;
   --radius-md: 14px;
@@ -60,6 +65,11 @@
   --mint-dim: rgba(21, 128, 61, 0.08);
   --mint-glow: rgba(21, 128, 61, 0.12);
 
+ --accent-primary: #15803d;
+  --accent-success: #16a34a;
+  --accent-warning: #d97706;
+  --accent-danger: #dc2626;
+  
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
   --shadow-elevated: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -240,7 +250,6 @@ body {
 
 .brand-logo-img {
   height: 100px;
-  width: 660px;
   width: auto;
   object-fit: contain;
   display: block;
