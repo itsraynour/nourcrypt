@@ -7,12 +7,13 @@
   <title>NourCrypt - Zero-Knowledge Client-Side File Encryption (.nour)</title>
   <meta name="description"
     content="Encrypt and decrypt files up to 500MB directly inside your browser with 100% privacy (.nour format). Zero server uploads, powered by Web Workers & AES-256-GCM.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; connect-src 'self' https://unpkg.com;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; connect-src 'self' https://unpkg.com; worker-src 'self';">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="no-referrer">
   <link rel="icon" href="logo.png" type="image/png">
   <link rel="stylesheet" href="css/styles.css">
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js" integrity="sha384-ieG+IKD0d/ZPXyCBTMVAbqsQdns8QGJR/e26WMw7M4fkaI/rHcS/YIoi+ah9WGge" crossorigin="anonymous"></script>
+
 </head>
 
 <body>
@@ -277,7 +278,7 @@
           </div>
           <i data-lucide="chevron-down" class="faq-chevron"></i>
         </summary>
-        <div class="faq-answer">AES-256-GCM — the same authenticated encryption used by governments and banks. Your password is strengthened with 100,000 PBKDF2 iterations and a random salt to resist brute-force attacks.</div>
+        <div class="faq-answer">AES-256-GCM — the same authenticated encryption used by governments and banks. Your password is strengthened with 600,000 PBKDF2 iterations and a random salt to resist brute-force attacks.</div>
       </details>
 
       <details class="faq-item">
@@ -318,7 +319,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script src="js/app.js"></script>
-  <script>lucide.createIcons();</script>
+ 
 </body>
 
 </html>
