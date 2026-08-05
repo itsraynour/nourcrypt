@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - NourCrypt</title>
+  <meta name="description" content="NourCrypt Privacy Policy: Zero data collection, zero network tracking, 100% client-side privacy.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="page-preloader" id="pagePreloader">
+    <div class="preloader-content">
+      <div class="preloader-logo">
+        <img src="logo.png" alt="NourCrypt" class="preloader-logo-img">
+      </div>
+      <div class="preloader-bar">
+        <div class="preloader-progress"></div>
+      </div>
+      <div class="preloader-sub">Initializing Zero-Knowledge Sandbox...</div>
+    </div>
+  </div>
+
+  <div class="bg-glow">
+    <div class="bg-glow-sphere-1"></div>
+    <div class="bg-glow-sphere-2"></div>
+  </div>
+
+  <header class="navbar">
+    <a href="index.html" class="brand" title="NourCrypt Home">
+      <img src="logo.png" alt="NourCrypt Logo" class="brand-logo-img">
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link">Encrypt Tool</a>
+      <a href="how-it-works.html" class="nav-link">How It Works</a>
+      <a href="privacy.html" class="nav-link active">Privacy</a>
+      <a href="terms.html" class="nav-link">Terms</a>
+    </nav>
+    <div class="nav-actions">
+      <div class="security-badge">
+        <div class="pulse-dot"></div>
+        <span>100% Local</span>
+      </div>
+      <button id="themeToggle" class="btn-icon" aria-label="Toggle Theme">
+        <i data-lucide="moon" id="themeIcon"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="page-section">
+    <section class="hero-section">
+      <h1 class="hero-title">Privacy Policy</h1>
+      <p class="hero-subtitle">NourCrypt is built for total privacy with zero data retention.</p>
+    </section>
+
+    <div class="section-card">
+      <h2 class="section-title">1. Zero data collection</h2>
+      <p style="color: var(--text-secondary);">
+        NourCrypt does not collect, log, store, or transmit any user data, uploaded files, file metadata, IP addresses, or encryption keys. All file processing occurs entirely inside your browser's RAM using standard Web APIs.
+      </p>
+    </div>
+
+    <div class="section-card">
+      <h2 class="section-title">2. No server uploads</h2>
+      <p style="color: var(--text-secondary);">
+        When you select a file or enter text, no HTTP requests or WebSocket connections are initiated. Your input never leaves your device. Verify this in your browser's Developer Tools Network tab, or simply disconnect your internet before processing.
+      </p>
+    </div>
+
+    <div class="section-card">
+      <h2 class="section-title">3. Cookies & analytics</h2>
+      <p style="color: var(--text-secondary);">
+        NourCrypt uses no tracking cookies, analytics scripts, or ad trackers. The only local storage used is a simple preference key (<code>nourcrypt_theme</code>) to remember your light/dark mode choice.
+      </p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div>© 2026 NourCrypt · Zero-knowledge encryption</div>
+    <div class="footer-links">
+      <a href="index.html" class="footer-link">Encrypt Tool</a>
+      <a href="how-it-works.html" class="footer-link">How It Works</a>
+      <a href="terms.html" class="footer-link">Terms</a>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

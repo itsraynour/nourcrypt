@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NourCrypt - Zero-Knowledge Client-Side File Encryption (.nour)</title>
+  <meta name="description"
+    content="Encrypt and decrypt files up to 500MB directly inside your browser with 100% privacy (.nour format). Zero server uploads, powered by Web Workers & AES-256-GCM.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+  <div class="page-preloader" id="pagePreloader">
+    <div class="preloader-content">
+      <div class="preloader-logo">
+        <img src="logo.png" alt="NourCrypt" class="preloader-logo-img">
+      </div>
+      <div class="preloader-bar">
+        <div class="preloader-progress"></div>
+      </div>
+      <div class="preloader-sub">Initializing Zero-Knowledge Sandbox...</div>
+    </div>
+  </div>
+
+  <div class="bg-glow">
+    <div class="bg-glow-sphere-1"></div>
+    <div class="bg-glow-sphere-2"></div>
+  </div>
+
+  <header class="navbar">
+    <a href="index.html" class="brand" title="NourCrypt Home">
+      <img src="logo.png" alt="NourCrypt Logo" class="brand-logo-img">
+    </a>
+
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link active">Encrypt Tool</a>
+      <a href="how-it-works.html" class="nav-link">How It Works</a>
+      <a href="privacy.html" class="nav-link">Privacy</a>
+      <a href="terms.html" class="nav-link">Terms</a>
+    </nav>
+
+    <div class="nav-actions">
+      <div class="security-badge" title="Everything runs 100% in your browser">
+        <div class="pulse-dot"></div>
+        <span>100% Local</span>
+      </div>
+      <button id="themeToggle" class="btn-icon" aria-label="Toggle Theme">
+        <i data-lucide="moon" id="themeIcon"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="main-wrapper">
+
+    <section class="hero-section">
+      <h1 class="hero-title">Encrypt files privately in your browser</h1>
+      <p class="hero-subtitle">
+        AES-256-GCM encryption that runs entirely offline.
+        Your files never leave your device.
+      </p>
+    </section>
+
+    <div class="app-card">
+
+      <div class="tab-container" role="tablist">
+        <button class="tab-btn active" id="tabEncrypt" data-tab="encrypt">
+          <i data-lucide="lock"></i>
+          <span>Encrypt</span>
+        </button>
+        <button class="tab-btn" id="tabDecrypt" data-tab="decrypt">
+          <i data-lucide="key-round"></i>
+          <span>Decrypt</span>
+        </button>
+        <button class="tab-btn" id="tabText" data-tab="text">
+          <i data-lucide="file-text"></i>
+          <span>Text</span>
+        </button>
+        <button class="tab-btn" id="tabPassgen" data-tab="passgen">
+          <i data-lucide="key"></i>
+          <span>Key Gen</span>
+        </button>
+      </div>
+
+      <div class="tab-content" id="fileTabContent">
+
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" style="display: none;">
+          <div class="drop-icon">
+            <i data-lucide="upload-cloud" size="26"></i>
+          </div>
+          <div class="drop-title" id="dropTitle">Drop a file or click to browse</div>
+          <div class="drop-sub" id="dropSub">Any file type up to 500 MB · Never uploaded</div>
+        </div>
+
+        <div class="file-selected-card" id="fileCard" style="display: none;">
+          <div class="file-info">
+            <div class="file-type-icon" id="fileExtBadge">FILE</div>
+            <div class="file-meta">
+              <div class="file-name" id="fileName">example_document.pdf</div>
+              <div class="file-size" id="fileSize">14.2 MB</div>
+            </div>
+          </div>
+          <button class="btn-remove" id="btnRemoveFile" title="Remove file">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="customOutputName">
+            <span id="customNameLabel">Output filename (optional)</span>
+          </label>
+          <div class="input-wrapper">
+            <input type="text" id="customOutputName" class="input-field"
+              placeholder="Leave blank for random name (e.g. encrypted_a7f9b2c4.nour)">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="passwordInput">
+            <span id="pwdLabel">Password</span>
+          </label>
+          <div class="input-wrapper">
+            <input type="password" id="passwordInput" class="input-field" placeholder="Enter a strong password"
+              autocomplete="off">
+            <button class="toggle-pwd" id="togglePwd" type="button" title="Show/Hide Password">
+              <i data-lucide="eye" id="pwdEyeIcon"></i>
+            </button>
+          </div>
+
+          <div class="strength-meter" id="strengthMeter">
+            <div class="strength-bar" id="strengthBar"></div>
+          </div>
+          <div class="strength-label">
+            <span id="strengthText">Enter password</span>
+            <button type="button" id="btnAutoGenerate" class="btn-link">Auto-generate</button>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="btnAction" disabled>
+          <i data-lucide="lock" id="btnActionIcon"></i>
+          <span id="btnActionText">Encrypt File</span>
+        </button>
+
+        <div class="progress-card" id="progressCard" style="display: none;">
+          <div class="progress-header">
+            <div class="progress-header-left">
+              <span class="spinner" id="progressSpinner"></span>
+              <span id="progressStatusText">Encrypting…</span>
+            </div>
+            <span id="progressPercent">0%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+          </div>
+          <div class="progress-stats">
+            <span id="progressProcessed">0 MB / 0 MB</span>
+            <span id="progressSpeed">0.00 MB/s</span>
+            <span id="progressEta">ETA: --</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="tab-content" id="textTabContent" style="display: none;">
+        <div class="form-group">
+          <label class="form-label" for="textInput">Your message</label>
+          <textarea id="textInput" class="textarea-field"
+            placeholder="Type or paste text to encrypt or decrypt…"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="textPasswordInput">Passphrase</label>
+          <div class="input-wrapper">
+            <input type="password" id="textPasswordInput" class="input-field" placeholder="Enter passphrase">
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" id="btnEncryptText" style="flex: 1;">
+            <i data-lucide="lock"></i>
+            <span>Encrypt</span>
+          </button>
+          <button class="btn-primary btn-outline" id="btnDecryptText" style="flex: 1;">
+            <i data-lucide="key-round"></i>
+            <span>Decrypt</span>
+          </button>
+        </div>
+
+        <div class="form-group" id="textResultGroup" style="margin-top: 20px; display: none;">
+          <label class="form-label">Result</label>
+          <textarea id="textResult" class="textarea-field" readonly></textarea>
+          <div class="btn-row" style="margin-top: 12px;">
+            <button class="btn-primary" id="btnCopyTextResult" style="flex: 1;">
+              <i data-lucide="copy"></i>
+              <span>Copy Result</span>
+            </button>
+            <button class="btn-primary btn-outline" id="btnDownloadTextResult" style="flex: 1;">
+              <i data-lucide="download"></i>
+              <span>Download .txt</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="passgenTabContent" style="display: none;">
+        <div class="form-group">
+          <label class="form-label">Generated passphrase</label>
+          <div class="input-wrapper">
+            <input type="text" id="genKeyOutput" class="input-field" readonly
+              style="font-family: 'JetBrains Mono', monospace;">
+            <button class="toggle-pwd" id="btnRegenerateKey" title="Generate New Key">
+              <i data-lucide="refresh-cw"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="genIncludeSymbols" checked> Symbols (!@#$)
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="genIncludeNumbers" checked> Numbers (0-9)
+          </label>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" id="btnCopyGeneratedKey" style="flex: 1;">
+            <i data-lucide="copy"></i>
+            <span>Copy Passphrase</span>
+          </button>
+          <button class="btn-primary btn-outline" id="btnDownloadGeneratedKey" style="flex: 1;">
+            <i data-lucide="download"></i>
+            <span>Download .txt</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <section class="faq-section">
+      <h2 class="faq-title">Frequently asked questions</h2>
+
+      <details class="faq-item" open>
+        <summary class="faq-question">
+          <div class="faq-q-left">
+            <div class="faq-icon"><i data-lucide="wifi-off"></i></div>
+            <span>Does it work without internet?</span>
+          </div>
+          <i data-lucide="chevron-down" class="faq-chevron"></i>
+        </summary>
+        <div class="faq-answer">Yes — NourCrypt runs 100% inside your browser. All encryption and decryption is handled by a local Web Worker. You can disconnect your internet and it will still work perfectly.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">
+          <div class="faq-q-left">
+            <div class="faq-icon"><i data-lucide="hard-drive"></i></div>
+            <span>What's the maximum file size?</span>
+          </div>
+          <i data-lucide="chevron-down" class="faq-chevron"></i>
+        </summary>
+        <div class="faq-answer">Up to 500 MB. Files are processed in 8 MB chunks using streaming, so your browser stays fast and responsive even with large files. Performance depends on your device's RAM and CPU.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">
+          <div class="faq-q-left">
+            <div class="faq-icon"><i data-lucide="shield-check"></i></div>
+            <span>What encryption standard is used?</span>
+          </div>
+          <i data-lucide="chevron-down" class="faq-chevron"></i>
+        </summary>
+        <div class="faq-answer">AES-256-GCM — the same authenticated encryption used by governments and banks. Your password is strengthened with 100,000 PBKDF2 iterations and a random salt to resist brute-force attacks.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">
+          <div class="faq-q-left">
+            <div class="faq-icon"><i data-lucide="eye-off"></i></div>
+            <span>Can you see my files or passwords?</span>
+          </div>
+          <i data-lucide="chevron-down" class="faq-chevron"></i>
+        </summary>
+        <div class="faq-answer">No. NourCrypt is zero-knowledge — your files and passwords never leave your device. There are no server uploads, no analytics, and no tracking. You can verify this in your browser's Network tab.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">
+          <div class="faq-q-left">
+            <div class="faq-icon"><i data-lucide="alert-triangle"></i></div>
+            <span>What if I forget my password?</span>
+          </div>
+          <i data-lucide="chevron-down" class="faq-chevron"></i>
+        </summary>
+        <div class="faq-answer">Your encrypted file cannot be recovered. Since NourCrypt never stores or transmits your password, there is no "forgot password" option. Always keep a secure backup of your passphrases.</div>
+      </details>
+
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div>© 2026 NourCrypt · Zero-knowledge encryption</div>
+    <div class="footer-links">
+      <a href="how-it-works.html" class="footer-link">How It Works</a>
+      <a href="privacy.html" class="footer-link">Privacy</a>
+      <a href="terms.html" class="footer-link">Terms</a>
+    </div>
+  </footer>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="js/app.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+
+</html>

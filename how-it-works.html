@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How It Works - NourCrypt Security & Architecture</title>
+  <meta name="description" content="Technical architecture of NourCrypt: Learn how client-side Web Crypto API, PBKDF2, and AES-256-GCM protect your files without sending data to servers.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <div class="page-preloader" id="pagePreloader">
+    <div class="preloader-content">
+      <div class="preloader-logo">
+        <img src="logo.png" alt="NourCrypt" class="preloader-logo-img">
+      </div>
+      <div class="preloader-bar">
+        <div class="preloader-progress"></div>
+      </div>
+      <div class="preloader-sub">Initializing Zero-Knowledge Sandbox...</div>
+    </div>
+  </div>
+
+  <div class="bg-glow">
+    <div class="bg-glow-sphere-1"></div>
+    <div class="bg-glow-sphere-2"></div>
+  </div>
+
+  <header class="navbar">
+    <a href="index.html" class="brand" title="NourCrypt Home">
+      <img src="logo.png" alt="NourCrypt Logo" class="brand-logo-img">
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link">Encrypt Tool</a>
+      <a href="how-it-works.html" class="nav-link active">How It Works</a>
+      <a href="privacy.html" class="nav-link">Privacy</a>
+      <a href="terms.html" class="nav-link">Terms</a>
+    </nav>
+    <div class="nav-actions">
+      <div class="security-badge">
+        <div class="pulse-dot"></div>
+        <span>100% Local</span>
+      </div>
+      <button id="themeToggle" class="btn-icon" aria-label="Toggle Theme">
+        <i data-lucide="moon" id="themeIcon"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="page-section">
+    <section class="hero-section">
+      <h1 class="hero-title">How NourCrypt works</h1>
+      <p class="hero-subtitle">Zero-knowledge encryption that never sends your data anywhere.</p>
+    </section>
+
+    <div class="section-card">
+      <h2 class="section-title">100% client-side execution</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 14px;">
+        Traditional encryption tools upload your files to a server. NourCrypt is different — all cryptographic operations run directly inside your browser's JavaScript sandbox via native <code>window.crypto.subtle</code> APIs.
+      </p>
+      <p style="color: var(--text-secondary);">
+        Your files, plaintext, and secret keys never cross the internet or touch any server. You can verify this by checking your browser's Network tab.
+      </p>
+    </div>
+
+    <div class="section-card">
+      <h2 class="section-title">Cryptographic standards</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i data-lucide="key"></i></div>
+          <div class="feature-heading">PBKDF2 key derivation</div>
+          <div class="feature-desc">Your password is stretched with <strong>100,000 iterations</strong> using SHA-256 and a 16-byte random salt to generate a 256-bit key.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i data-lucide="shield"></i></div>
+          <div class="feature-heading">AES-256-GCM cipher</div>
+          <div class="feature-desc">Galois/Counter Mode provides both confidentiality and built-in authentication codes to detect file tampering.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i data-lucide="cpu"></i></div>
+          <div class="feature-heading">Web Worker chunking</div>
+          <div class="feature-desc">Files up to 500 MB are processed in 8 MB chunks inside non-blocking Web Workers for smooth UI.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2 class="section-title">The .nour file format</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 14px;">
+        Encrypted files are saved as self-contained <code>.nour</code> packages:
+      </p>
+      <ul style="color: var(--text-secondary); padding-left: 20px; line-height: 1.9;">
+        <li><strong>Magic signature (9 bytes):</strong> Identifies the format (<code>NOURCRYPT</code>)</li>
+        <li><strong>Salt & IV (28 bytes):</strong> 16-byte PBKDF2 salt + 12-byte master IV</li>
+        <li><strong>Encrypted metadata:</strong> AES-GCM encrypted JSON with original name, size, MIME type</li>
+        <li><strong>Chunk stream:</strong> 8 MB slices encrypted with unique IVs</li>
+        <li><strong>Custom naming:</strong> Choose a name or use automatic anonymization</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div>© 2026 NourCrypt · Zero-knowledge encryption</div>
+    <div class="footer-links">
+      <a href="index.html" class="footer-link">Encrypt Tool</a>
+      <a href="privacy.html" class="footer-link">Privacy</a>
+      <a href="terms.html" class="footer-link">Terms</a>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>
