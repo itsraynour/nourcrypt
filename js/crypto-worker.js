@@ -10,6 +10,32 @@ function bytesToStr(bytes) {
   return new TextDecoder().decode(bytes);
 }
 
+// Safe binary-to-base64 that avoids stack overflow from spread operator
+function uint8ToBase64(uint8) {
+  const CHUNK = 8192;
+  let binary = '';
+  for (let i = 0; i < uint8.length; i += CHUNK) {
+    const slice = uint8.subarray(i, Math.min(i + CHUNK, uint8.length));
+    binary += String.fromCharCode.apply(null, slice);
+  }
+  return btoa(binary);
+}
+
+function base64ToUint8(b64) {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+// Sanitize filenames to prevent path traversal or invalid characters
+function sanitizeFileName(name) {
+  // Strip path separators and parent directory references
+  return name.replace(/[\\\/]/g, '_').replace(/\.\./g, '_').replace(/^\s+|\s+$/g, '');
+}
+
 async function deriveKey(password, salt) {
   const passwordBytes = strToBytes(password);
   const baseKey = await self.crypto.subtle.importKey(
@@ -41,6 +67,10 @@ function generateIV(length = 12) {
 async function handleEncryptFile(file, password, customOutputName) {
   const startTime = performance.now();
   const totalSize = file.size;
+
+  if (totalSize === 0) {
+    throw new Error("Cannot encrypt an empty (0 bytes) file.");
+  }
 
   const salt = self.crypto.getRandomValues(new Uint8Array(16));
   const masterIV = generateIV(12);
@@ -83,7 +113,7 @@ async function handleEncryptFile(file, password, customOutputName) {
   let chunkIndex = 0;
   let processedBytes = 0;
 
-  while (offset < totalSize || totalSize === 0) {
+  while (offset < totalSize) {
     const chunkEnd = Math.min(offset + CHUNK_SIZE, totalSize);
     const blobSlice = file.slice(offset, chunkEnd);
     const chunkBuffer = await blobSlice.arrayBuffer();
@@ -129,7 +159,8 @@ async function handleEncryptFile(file, password, customOutputName) {
   
   let outputFileName = "";
   if (customOutputName && customOutputName.trim()) {
-    let name = customOutputName.trim();
+    let name = sanitizeFileName(customOutputName.trim());
+    if (!name) name = 'encrypted';
     outputFileName = name.endsWith(".nour") ? name : `${name}.nour`;
   } else {
     const randHash = Array.from(self.crypto.getRandomValues(new Uint8Array(4)))
@@ -237,7 +268,7 @@ async function handleDecryptFile(file, password, customOutputName) {
   
   let finalDecryptedName = metadata.name || "decrypted_file";
   if (customOutputName && customOutputName.trim()) {
-    finalDecryptedName = customOutputName.trim();
+    finalDecryptedName = sanitizeFileName(customOutputName.trim()) || "decrypted_file";
   }
 
   self.postMessage({
@@ -260,9 +291,9 @@ async function handleEncryptText(text, password) {
     textBytes
   );
 
-  const saltB64 = btoa(String.fromCharCode(...salt));
-  const ivB64 = btoa(String.fromCharCode(...iv));
-  const cipherB64 = btoa(String.fromCharCode(...new Uint8Array(ciphertextBuf)));
+  const saltB64 = uint8ToBase64(salt);
+  const ivB64 = uint8ToBase64(iv);
+  const cipherB64 = uint8ToBase64(new Uint8Array(ciphertextBuf));
 
   const result = `NOUR1:${saltB64}:${ivB64}:${cipherB64}`;
   self.postMessage({ type: "TEXT_SUCCESS", result });
@@ -276,9 +307,9 @@ async function handleDecryptText(formattedText, password) {
 
   let salt, iv, cipherBytes;
   try {
-    salt = Uint8Array.from(atob(parts[1]), c => c.charCodeAt(0));
-    iv = Uint8Array.from(atob(parts[2]), c => c.charCodeAt(0));
-    cipherBytes = Uint8Array.from(atob(parts[3]), c => c.charCodeAt(0));
+    salt = base64ToUint8(parts[1]);
+    iv = base64ToUint8(parts[2]);
+    cipherBytes = base64ToUint8(parts[3]);
   } catch (e) {
     throw new Error("Invalid base64 encoding in encrypted text.");
   }
