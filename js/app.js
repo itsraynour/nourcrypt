@@ -72,6 +72,7 @@
     } else {
       bindEvents();
     }
+    if (window.lucide) lucide.createIcons();
   }
 
   function dismissPreloader() {
@@ -209,8 +210,11 @@
     }
     if (btnCopyTextResult && textResult) {
       btnCopyTextResult.addEventListener('click', () => {
-        navigator.clipboard.writeText(textResult.value);
+        navigator.clipboard.writeText(textResult.value).then(() => {
         showToast('Result copied to clipboard', 'success');
+        }).catch(() => {
+          showToast('Clipboard access denied. Copy manually.', 'error');
+        });
       });
     }
     if (btnDownloadTextResult && textResult) {
@@ -230,8 +234,11 @@
     }
     if (btnCopyGeneratedKey && genKeyOutput) {
       btnCopyGeneratedKey.addEventListener('click', () => {
-        navigator.clipboard.writeText(genKeyOutput.value);
+        navigator.clipboard.writeText(genKeyOutput.value).then(() => {
         showToast('Passphrase copied to clipboard', 'success');
+        }).catch(() => {
+          showToast('Clipboard access denied. Copy manually.', 'error');
+        });
       });
     }
     if (btnDownloadGeneratedKey && genKeyOutput) {
@@ -288,8 +295,12 @@
     validateForm();
   }
 
-  function handleFileSelect(file) {
-    if (file.size > 550 * 1024 * 1024) {
+   function handleFileSelect(file) {
+    if (file.size === 0) {
+      showToast('File is empty (0 bytes).', 'error');
+      return;
+    }
+    if (file.size > 500 * 1024 * 1024) {
       showToast('File size exceeds 500MB limit.', 'error');
       return;
     }
@@ -404,7 +415,7 @@
     a.click();
     document.body.removeChild(a);
 
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
 
     showToast(`File ${state.mode === 'encrypt' ? 'encrypted' : 'decrypted'} successfully!`, 'success');
     resetProcessingState();
@@ -412,16 +423,20 @@
 
   function resetProcessingState() {
     state.isProcessing = false;
-    passwordInput.disabled = false;
-    btnRemoveFile.disabled = false;
-    customOutputName.disabled = false;
-    progressCard.style.display = 'none';
+    if (passwordInput) passwordInput.disabled = false;
+    if (btnRemoveFile) btnRemoveFile.disabled = false;
+    if (customOutputName) customOutputName.disabled = false;
+    if (progressCard) progressCard.style.display = 'none';
+    if (progressBarFill) {;
     progressBarFill.style.width = '0%';
     progressBarFill.classList.remove('is-active');
-
-    btnActionIcon.classList.remove('spin-icon');
-    btnActionIcon.setAttribute('data-lucide', state.mode === 'encrypt' ? 'lock' : 'key-round');
-    btnActionText.textContent = state.mode === 'encrypt' ? 'Encrypt File' : 'Decrypt File';
+    }
+    
+    if (btnActionIcon) {
+      btnActionIcon.classList.remove('spin-icon');
+      btnActionIcon.setAttribute('data-lucide', state.mode === 'encrypt' ? 'lock' : 'key-round');
+    }
+    if (btnActionText) btnActionText.textContent = state.mode === 'encrypt' ? 'Encrypt File' : 'Decrypt File';
     if (window.lucide) lucide.createIcons();
 
     resetTextLoadingState();
@@ -496,11 +511,17 @@
     if (useNumbers) chars += '0123456789';
     if (useSymbols) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
 
-    const array = new Uint32Array(length);
-    window.crypto.getRandomValues(array);
+    const maxValid = Math.floor(0x100000000 / chars.length) * chars.length;
+
     let result = '';
-    for (let i = 0; i < length; i++) {
+     while (result.length < length) {
+      const array = new Uint32Array(length - result.length);
+      window.crypto.getRandomValues(array);
+      for (let i = 0; i < array.length && result.length < length; i++) {
+        if (array[i] < maxValid) {
       result += chars[array[i] % chars.length];
+        }
+      }
     }
     return result;
   }
