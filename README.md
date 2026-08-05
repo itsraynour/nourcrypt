@@ -8,7 +8,7 @@ NourCrypt processes all files locally inside your browser's Web Worker thread. N
 
 - **Local Processing**: Encrypts and decrypts files up to 500 MB directly in browser RAM.
 - **AES-256-GCM Encryption**: Authenticated symmetric encryption with 128-bit authentication tags to prevent file tampering.
-- **PBKDF2 Key Derivation**: Uses 100,000 iterations of SHA-256 with a unique 16-byte random salt for password hashing.
+- **PBKDF2 Key Derivation**: Uses 600,000 iterations of SHA-256 with a unique 16-byte random salt for password hashing.
 - **Chunked Streaming**: Splits files into 8 MB chunks processed via Web Workers to keep the UI responsive.
 - **Text Encryption**: Option to encrypt and decrypt plain text messages directly in the browser.
 - **Passphrase Generator**: Built-in cryptographically secure random password generator.
@@ -18,7 +18,7 @@ NourCrypt processes all files locally inside your browser's Web Worker thread. N
 NourCrypt uses the browser's native `window.crypto.subtle` API for cryptographic operations:
 
 1. A 16-byte salt and 12-byte master IV are generated using `crypto.getRandomValues`.
-2. The user's password is key-stretched via PBKDF2 (`SHA-256`, 100,000 iterations) to derive a 256-bit AES-GCM key.
+2. The user's password is key-stretched via PBKDF2 (`SHA-256`, 600,000 iterations) to derive a 256-bit AES-GCM key.
 3. File metadata (original filename, size, MIME type) is encrypted using the derived key and master IV.
 4. File data is split into 8 MB chunks, each encrypted with AES-256-GCM using a unique per-chunk 12-byte IV.
 5. All binary components are serialized into a `.nour` container file.
@@ -60,7 +60,6 @@ nourcrypt/
 ├── js/
 │   ├── app.js                       # DOM handlers and worker message dispatcher
 │   └── crypto-worker.js             # Web Worker background crypto engine
-├── SECURITY_AND_ARCHITECTURE_AR.md # Technical documentation in Arabic
 ├── LICENSE                          # MIT License
 └── README.md                        # Documentation
 ```
