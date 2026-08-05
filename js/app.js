@@ -295,7 +295,7 @@
     validateForm();
   }
 
-   function handleFileSelect(file) {
+  function handleFileSelect(file) {
     if (file.size === 0) {
       showToast('File is empty (0 bytes).', 'error');
       return;
@@ -306,14 +306,14 @@
     }
 
     state.selectedFile = file;
-    fileNameEl.textContent = file.name;
-    fileSizeEl.textContent = formatBytes(file.size);
+    if (fileNameEl) fileNameEl.textContent = file.name;
+    if (fileSizeEl) fileSizeEl.textContent = formatBytes(file.size);
 
     const ext = file.name.split('.').pop().toUpperCase();
-    fileExtBadge.textContent = ext.length <= 4 ? ext : 'FILE';
+    if (fileExtBadge) fileExtBadge.textContent = ext.length <= 4 ? ext : 'FILE';
 
-    dropZone.style.display = 'none';
-    fileCard.style.display = 'flex';
+    if (dropZone) dropZone.style.display = 'none';
+    if (fileCard) fileCard.style.display = 'flex';
 
     if (file.name.endsWith('.nour') && state.mode === 'encrypt') {
       switchTab('decrypt');
@@ -427,9 +427,9 @@
     if (btnRemoveFile) btnRemoveFile.disabled = false;
     if (customOutputName) customOutputName.disabled = false;
     if (progressCard) progressCard.style.display = 'none';
-    if (progressBarFill) {;
-    progressBarFill.style.width = '0%';
-    progressBarFill.classList.remove('is-active');
+    if (progressBarFill) {
+      progressBarFill.style.width = '0%';
+      progressBarFill.classList.remove('is-active');
     }
     
     if (btnActionIcon) {
@@ -444,6 +444,7 @@
   }
 
   function processTextCrypto(action) {
+    if (!textInput || !textPasswordInput) return;
     const text = textInput.value.trim();
     const password = textPasswordInput.value;
 
@@ -514,12 +515,12 @@
     const maxValid = Math.floor(0x100000000 / chars.length) * chars.length;
 
     let result = '';
-     while (result.length < length) {
+    while (result.length < length) {
       const array = new Uint32Array(length - result.length);
       window.crypto.getRandomValues(array);
       for (let i = 0; i < array.length && result.length < length; i++) {
         if (array[i] < maxValid) {
-      result += chars[array[i] % chars.length];
+          result += chars[array[i] % chars.length];
         }
       }
     }
