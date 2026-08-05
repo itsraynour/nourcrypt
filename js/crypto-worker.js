@@ -1,6 +1,6 @@
 const MAGIC_HEADER = "NOURCRYPT";
 const CHUNK_SIZE = 8 * 1024 * 1024;
-const PBKDF2_ITERATIONS = 100000;
+const PBKDF2_ITERATIONS = 600000;
 
 function strToBytes(str) {
   return new TextEncoder().encode(str);
@@ -61,6 +61,10 @@ async function handleEncryptFile(file, password, customOutputName) {
   );
   const encryptedMetadata = new Uint8Array(encryptedMetadataBuf);
 
+ if (encryptedMetadata.length > 65535) {
+    throw new Error("Encrypted metadata exceeds maximum supported size (65,535 bytes). Try a shorter filename.");
+  }
+  
   const magicBytes = strToBytes(MAGIC_HEADER);
   const versionBytes = new Uint8Array([0x00, 0x01]);
   const metaLenBytes = new Uint8Array(2);
